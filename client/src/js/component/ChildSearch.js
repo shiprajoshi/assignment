@@ -1,3 +1,4 @@
+//Component for the Search box. Allows us to search by a entering a word and serching it in imdb api.
 var React= require('react');
 
 var ChildSearch=React.createClass({

@@ -5,70 +5,76 @@ var app=express();
 
 
 var loggerTest=function(req,res,next){
-
-movieObj.find(function(err,data){
-  if(err)
-  res.send(err);
-  else
+  movieObj.find(function(err,data){
+    if(err)
+    res.send(err);
+    else
     {
       console.log("successfull middleware");
       res.send(data);
     }
-});
+  });
 }
-app.get('/display',function(req,res,next){
-  console.log("inside get");
-  //var movie=mongoose.model("MovieDetails")
-  movieObj.find({},function(err,data){
-    if(err){
-        res.send("error in get");
-          }
-    else {
-    res.json(data);
-    }
-  })
-}
-);
 
 app.post('/add',function(req,res){
   var movie =new movieObj(req.body);
 
   movie.save(function(err){
-   if(err)
-   {
-     res.send(err);
-   }
-   else
-   {
-     res.send("Movie inserted");
-   }
-  console.log("hello");
-  console.log(req.body);
-})
+    if(err)
+    {
+      res.send(err);
+    }
+    else
+    {
+      res.send("Movie inserted");
+    }
+    //console.log("hello");
+    //console.log(req.body);
+  })
 });
 
+app.get('/display',function(req,res,next){
+  //console.log("inside get");
+  //var movie=mongoose.model("MovieDetails")
+  movieObj.find({},function(err,data){
+    if(err){
+      res.send("error in get");
+    }
+    else {
+      console.log("successfully displayed");
+      res.json(data);
+    }
+  })
+}
+);
+
+
 app.delete('/delete/:id',function(req,res,next){
-  console.log(req.params.id);
+  //console.log(req.params.id);
   //var movie=mongoose.model("MovieDetails");
   movieObj.findOneAndRemove({imdbID: req.params.id}, function (err,offer){
-    if(err) { throw err; }
+    if(err) { res.send(err);
+
+      console.log(err);
+     }
     else{
-      console.log("successfully deleted");
+      // console.log("successfully deleted");
+      //res.send("successfully deleted");
       next();
     }
-    })
+  })
 });
 
 app.put('/update/:imdbID/:Title',function(req,res,next){
 
- movieObj.findOneAndUpdate({ imdbID: req.params.imdbID} , {Title: req.params.Title} , function (err,movies) {
-  if (err) {res.send(err);}
-   else{
-      console.log("Update successful");
+  movieObj.findOneAndUpdate({ imdbID: req.params.imdbID} , {Title: req.params.Title} , function (err,movies) {
+    if (err) {res.send(err);}
+    else{
+        console.log("Update successful");
+      //res.send("successfully updated");
       next();
-
-   }
- });
+    }
+  });
 
 });
 app.use(loggerTest);

@@ -26198,7 +26198,7 @@ var About=React.createClass({displayName: "About",
     return (
       React.createElement("div", null, 
       React.createElement("div", null, 
-        React.createElement("h3", null, " I am ", this.props.params.id)
+      React.createElement("h3", null, " I am ", this.props.params.id)
       )
       )
     )
@@ -26206,12 +26206,11 @@ var About=React.createClass({displayName: "About",
 });
 module.exports=About;
 },{"react":257}],261:[function(require,module,exports){
+//Component that allows us to get the entire list of movies with a particular word. Has 1 child Gc.
 var React=require('react');
 var Gc=require('./Gc');
 
 var ChildMain=React.createClass({displayName: "ChildMain",
-
-
   render:function(){
     var commentNodes = this.props.movieArr.map(function(arr) {
      return (
@@ -26231,6 +26230,7 @@ var ChildMain=React.createClass({displayName: "ChildMain",
 
 module.exports=ChildMain;
 },{"./Gc":264,"react":257}],262:[function(require,module,exports){
+//Component for the Search box. Allows us to search by a entering a word and serching it in imdb api.
 var React= require('react');
 
 var ChildSearch=React.createClass({displayName: "ChildSearch",
@@ -26266,121 +26266,125 @@ var ChildSearch=React.createClass({displayName: "ChildSearch",
 
 module.exports=ChildSearch;
 },{"react":257}],263:[function(require,module,exports){
+//Component For displaying Favourite Movies(making ajax calls). GcFavMovie is its child component
 var React=require('react')
 var GcFavMovie=require('./GcFavMovie');
 
 var FavMovie=React.createClass({displayName: "FavMovie",
-    getInitialState: function(){
-      return({mydata: []})
-    },
+  getInitialState: function(){
+    return({mydata: []})
+  },
 
-    componentWillMount: function(){
-      console.log("i am coming in");
-      $.ajax({
-           url: "http://localhost:8085/movie/display",
-           dataType: 'json',
-           type:"GET",
-           async: true,
-           cache: false,
-           success: function(data)
-           {
-              this.setState({mydata : data});
-              console.log(data);
-           }  .bind(this),
-           error: function(xhr, status, err) {
-             console.error("http://localhost:8085/movie/display", status, err.toString());
-           }.bind(this)
-         });
-    },
+  //Ajax call for display
+  componentWillMount: function(){
+    console.log("i am coming in");
+    $.ajax({
+      url: "http://localhost:8085/movie/display",
+      dataType: 'json',
+      type:"GET",
+      async: true,
+      cache: false,
+      success: function(data)
+      {
+        this.setState({mydata : data});
+        console.log(data);
+      }  .bind(this),
+      error: function(xhr, status, err) {
+        console.error("http://localhost:8085/movie/display", status, err.toString());
+      }.bind(this)
+    });
+  },
 
+  //ajax call for delete
+  changeState:function(id){
+    console.log(id);
+    $.ajax({
+      url: "http://localhost:8085/movie/delete/"+id,
+      type:"DELETE",
+      cache: false,
+      success: function(d)
+      {
+        console.log("inside delete ajax");
+        this.setState({mydata:d});
+        //this.props.changeState(this.props.imdbID);
+      }  .bind(this),
+      error: function(xhr, status, err) {
+        console.error("http://localhost:8085/movie/delete/", status, err.toString());
+      }.bind(this)
+    });
 
-    changeState:function(id){
-      console.log(id);
-      $.ajax({
-           url: "http://localhost:8085/movie/delete/"+id,
-           type:"DELETE",
-           cache: false,
-           success: function(d)
-           {
-              console.log("inside delete ajax");
-              this.setState({mydata:d});
-              //this.props.changeState(this.props.imdbID);
-           }  .bind(this),
-           error: function(xhr, status, err) {
-             console.error("http://localhost:8085/movie/delete/", status, err.toString());
-           }.bind(this)
-         });
+  },
 
-    },
+  //ajax call for updation
+  onUpdate:function(id,title){
+    console.log("update");
+    //alert("http://localhost:8085/movie/update/"+id+"/"+title);
+    $.ajax({
+      url: "http://localhost:8085/movie/update/"+id+"/"+title,
+      type:"PUT",
+      cache: false,
+      success: function(d)
+      {
+        this.setState({mydata:d});
+        console.log("inside put ajax");
+      }  .bind(this),
+      error: function(xhr, status, err) {
+        console.error("http://localhost:8085/movie/update/", status, err.toString());
+      }.bind(this)
+    });
+  },
 
-    onUpdate:function(id,title){
-      console.log("update");
-      alert("http://localhost:8085/movie/update/"+id+"/"+title);
-      $.ajax({
-           url: "http://localhost:8085/movie/update/"+id+"/"+title,
-           type:"PUT",
-           cache: false,
-           success: function(d)
-           {
-             this.setState({mydata:d});
-              console.log("inside put ajax");
-           }  .bind(this),
-           error: function(xhr, status, err) {
-             console.error("http://localhost:8085/movie/update/", status, err.toString());
-           }.bind(this)
-         });
-    },
-
-    render:function(){
-      var movieList = this.state.mydata.map(function(arr) {
-       return (
-         React.createElement("div", null, 
-         React.createElement(GcFavMovie, {allData: arr, imdbID: arr.imdbID, Poster: arr.Poster, Title: arr.Title, Year: arr.Year, Type: arr.Type, changeState: this.changeState, onUpdate: this.onUpdate})
-         )
-       );
-     }.bind(this));
-     return (
-           React.createElement("div", {className: "movieL"}, 
-             movieList
-           )
-         );
-    }
-});
+  //to render the compnent
+  render:function(){
+    var movieList = this.state.mydata.map(function(arr) {
+      return (
+        React.createElement("div", null, 
+        React.createElement(GcFavMovie, {allData: arr, imdbID: arr.imdbID, Poster: arr.Poster, Title: arr.Title, Year: arr.Year, Type: arr.Type, changeState: this.changeState, onUpdate: this.onUpdate})
+        )
+      );
+    }.bind(this));
+    return (
+      React.createElement("div", {className: "movieL"}, 
+      movieList
+      )
+    );}
+  });
 module.exports=FavMovie;
 },{"./GcFavMovie":265,"react":257}],264:[function(require,module,exports){
+//To Displays Seperate Movies in the List
 var React=require('react')
 var Gc=React.createClass({displayName: "Gc",
-send: function(){
-        console.log("i am coming in");
-        $.ajax({
-             url: "http://localhost:8085/movie/add",
-             dataType: 'json',
-             type:"POST",
-             cache: false,
-             data:this.props.allData,
-             success: function()
-             {
-               console.log("yes");
-               console.log("successfully sent");
-             },
-             error: function(xhr, status, err) {
-               console.error("http://localhost:8085/movie/add", status, err.toString());
-             }
-           });
+  send: function(){
+    console.log("i am coming in");
+    $.ajax({
+      url: "http://localhost:8085/movie/add",
+      dataType: 'json',
+      type:"POST",
+      cache: false,
+      data:this.props.allData,
+      success: function()
+      {
+        console.log("yes");
+        console.log("successfully sent");
       },
+      error: function(xhr, status, err) {
+        console.error("http://localhost:8085/movie/add", status, err.toString());
+      }
+    });
+  },
   render: function(){
     return (
       React.createElement("div", null, 
       React.createElement("div", {className: "row"}, 
-        React.createElement("div", {className: "col-lg-6", id: "left"}, 
-          React.createElement("img", {src: this.props.allData.Poster})
-        ), 
-        React.createElement("div", {className: "col-lg-6", id: "right"}, 
-          React.createElement("h3", null, this.props.allData.Title), 
-          React.createElement("h3", null, this.props.allData.Year), 
-          React.createElement("h3", null, this.props.allData.Type), 
-         React.createElement("input", {type: "button", value: "Add Favoiurite Movie", className: "btn btn-primary btn-medium", onClick: this.send})
-        )
+      React.createElement("div", {className: "col-lg-6", id: "left"}, 
+      React.createElement("img", {src: this.props.allData.Poster})
+      ), 
+      React.createElement("div", {className: "col-lg-6", id: "right"}, 
+      React.createElement("h3", null, this.props.allData.Title), 
+      React.createElement("h3", null, this.props.allData.Year), 
+      React.createElement("h3", null, this.props.allData.Type), 
+      React.createElement("input", {type: "button", value: "Add Favoiurite Movie", className: "btn btn-primary btn-medium", onClick: this.send})
+      )
       )
       )
     )
@@ -26388,75 +26392,71 @@ send: function(){
 });
 module.exports=Gc;
 },{"react":257}],265:[function(require,module,exports){
+//component that renders different fav. movie components.
 var React=require('react')
 var GcFavMovie=React.createClass({displayName: "GcFavMovie",
 
-    getInitialState: function(){
-            return ({allData:this.props.allData ,id:"#"+ this.props.allData.imdbID});
-    },
+  getInitialState: function(){
+    return ({allData:this.props.allData ,id:"#"+ this.props.allData.imdbID});
+  },
 
   DeleteMovie: function(){
-
     console.log("inside delete");
     this.props.changeState(this.props.imdbID);
-
   },
 
   updateMovie: function(){
     console.log("inside Update");
-    alert(this.props.imdbID +" " +this.props.Title);
     this.props.onUpdate(this.state.allData.imdbID,this.state.allData.Title);
-
   },
 
   titleChange: function(e){
-      console.log("inside change");
+    console.log("inside change");
     this.state.allData.Title=e.target.value;
   },
-
 
   render: function(){
     return (
       React.createElement("div", null, 
-        React.createElement("div", {className: "row"}, 
-          React.createElement("div", {className: "col-lg-6", id: "left"}, 
-              React.createElement("img", {src: this.props.allData.Poster})
-          ), 
-          React.createElement("div", {className: "col-lg-6", id: "right"}, 
-              React.createElement("h3", null, this.props.Title), 
-              React.createElement("h3", null, this.props.Year), 
-              React.createElement("h3", null, this.props.Type), 
-              React.createElement("input", {type: "button", value: "Delete Movie", className: "btn btn-primary btn-medium", onClick: this.DeleteMovie}), 
-              React.createElement("input", {type: "button", value: "Update Movie", className: "btn btn-primary btn-medium", "data-toggle": "modal", "data-target": this.state.id})
-          )
-        ), 
-        React.createElement("div", {id: this.props.imdbID, className: "modal fade", tabindex: "-1", role: "dialog"}, 
-              React.createElement("div", {className: "modal-dialog", role: "document"}, 
-                React.createElement("div", {className: "modal-content"}, 
-                  React.createElement("div", {className: "modal-header"}, 
-                    React.createElement("button", {type: "button", className: "close", "data-dismiss": "modal", "aria-label": "Close"}, React.createElement("span", {"aria-hidden": "true"}, "×")), 
-                    React.createElement("h4", {className: "modal-title"}, "Update Movie")
-                  ), 
-                  React.createElement("div", {className: "modal-body"}, 
+      React.createElement("div", {className: "row"}, 
+      React.createElement("div", {className: "col-lg-6", id: "left"}, 
+      React.createElement("img", {src: this.props.allData.Poster})
+      ), 
+      React.createElement("div", {className: "col-lg-6", id: "right"}, 
+      React.createElement("h3", null, this.props.Title), 
+      React.createElement("h3", null, this.props.Year), 
+      React.createElement("h3", null, this.props.Type), 
+      React.createElement("input", {type: "button", value: "Delete Movie", className: "btn btn-primary btn-medium", onClick: this.DeleteMovie}), 
+      React.createElement("input", {type: "button", value: "Update Movie", className: "btn btn-primary btn-medium", "data-toggle": "modal", "data-target": this.state.id})
+      )
+      ), 
+      React.createElement("div", {id: this.props.imdbID, className: "modal fade", tabindex: "-1", role: "dialog"}, 
+      React.createElement("div", {className: "modal-dialog", role: "document"}, 
+      React.createElement("div", {className: "modal-content"}, 
+      React.createElement("div", {className: "modal-header"}, 
+      React.createElement("button", {type: "button", className: "close", "data-dismiss": "modal", "aria-label": "Close"}, React.createElement("span", {"aria-hidden": "true"}, "×")), 
+      React.createElement("h4", {className: "modal-title"}, "Update Movie")
+      ), 
+      React.createElement("div", {className: "modal-body"}, 
 
-                  React.createElement("p", null, React.createElement("small", null, "Update the required Field.")), 
+      React.createElement("p", null, React.createElement("small", null, "Update the required Field.")), 
 
-                  React.createElement("form", {className: "form-horizontal"}, 
-                    React.createElement("div", {className: "form-group"}, 
-                      React.createElement("label", {className: "col-lg-4 control-label", for: "inputName"}, "Movie Name"), 
-                      React.createElement("div", {className: "col-lg-8"}, 
-                        React.createElement("input", {className: "form-control", id: "inputName", placeholder: this.props.Title, type: "text", onChange: this.titleChange})
-                      )
-                    )
-                  )
+      React.createElement("form", {className: "form-horizontal"}, 
+      React.createElement("div", {className: "form-group"}, 
+      React.createElement("label", {className: "col-lg-4 control-label", for: "inputName"}, "Movie Name"), 
+      React.createElement("div", {className: "col-lg-8"}, 
+      React.createElement("input", {className: "form-control", id: "inputName", placeholder: this.props.Title, type: "text", onChange: this.titleChange})
+      )
+      )
+      )
 
-                  ), 
-                  React.createElement("div", {className: "modal-footer"}, 
-                    React.createElement("button", {type: "button", className: "btn btn-default", "data-dismiss": "modal"}, "Close"), 
-                    React.createElement("button", {type: "button", className: "btn btn-primary", "data-dismiss": "modal", onClick: this.updateMovie}, "Save changes")
-                  )
-                )
-              )
+      ), 
+      React.createElement("div", {className: "modal-footer"}, 
+      React.createElement("button", {type: "button", className: "btn btn-default", "data-dismiss": "modal"}, "Close"), 
+      React.createElement("button", {type: "button", className: "btn btn-primary", "data-dismiss": "modal", onClick: this.updateMovie}, "Save changes")
+      )
+      )
+      )
       )
       )
 
@@ -26479,44 +26479,44 @@ var Home=React.createClass({displayName: "Home",
 });
 module.exports=Home;
 },{"react":257}],267:[function(require,module,exports){
+//Parent component has 2 childern ChildMain and ChildSearch
 var React= require('react');
 var ReactDOM=require('react-dom');
 var ChildSearch=require('./ChildSearch')
 var ChildMain=require('./ChildMain')
 
 var MovieBox=React.createClass({displayName: "MovieBox",
-
   getInitialState: function(){
     return({text: "hello", movieArr:[], url: "http://omdbapi.com/?s="})
   },
-
+  // ajax call to imdb api to get movies from their api to our website
   handleClick:function(data){
     $.ajax({
-         url: this.state.url+data,
-         dataType: 'json',
-         cache: false,
-         success: function(data) {
-
-           this.setState({movieArr:data.Search});
-           console.log(this.state.movieArr);
-         }.bind(this),
-         error: function(xhr, status, err) {
-           console.error(this.state.url, status, err.toString());
-         }.bind(this)
-       });
+      url: this.state.url+data,
+      dataType: 'json',
+      cache: false,
+      success: function(data) {
+        this.setState({movieArr:data.Search});
+        console.log(this.state.movieArr);
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(this.state.url, status, err.toString());
+      }.bind(this)
+    });
   },
 
   render: function() {
     return (
-        React.createElement("div", null, 
-        React.createElement(ChildSearch, {click: this.handleClick}), 
-        React.createElement(ChildMain, {sdata: this.state.text, movieArr: this.state.movieArr})
-        )
+      React.createElement("div", null, 
+      React.createElement(ChildSearch, {click: this.handleClick}), 
+      React.createElement(ChildMain, {sdata: this.state.text, movieArr: this.state.movieArr})
+      )
     )}
-})
+  })
 
-module.exports=MovieBox;
+  module.exports=MovieBox;
 },{"./ChildMain":261,"./ChildSearch":262,"react":257,"react-dom":76}],268:[function(require,module,exports){
+//Customised Link
 var React=require('React')
 var {Link}= require('react-router');
 
@@ -26529,6 +26529,7 @@ var NavLink=React.createClass({displayName: "NavLink",
 });
 module.exports=NavLink;
 },{"React":25,"react-router":106}],269:[function(require,module,exports){
+//Navigation Bar
 var React=require('React');
 var {Link}=require('react-router')
 var NavLink=require('./NavLink')
@@ -26538,31 +26539,31 @@ var Navbar=React.createClass({displayName: "Navbar",
   render:  function(){
     return(
       React.createElement("div", {className: "container-fluid", id: "navbaar"}, 
-	     React.createElement("div", {className: "row"}, 
-		React.createElement("div", {className: "col-md-12"}, 
-			React.createElement("ul", {className: "nav nav-pills"}, 
-				React.createElement("li", null, 
-					React.createElement(NavLink, {to: "/home"}, "Home")
-				), 
-				React.createElement("li", null, 
-					React.createElement(NavLink, {to: "/moviebox"}, "Movie Box")
-				), 
-        React.createElement("li", null, 
-          React.createElement(NavLink, {to: "/favmovie"}, "Favourite Movie")
-        ), 
-        React.createElement("li", null, 
-					React.createElement(NavLink, {to: "/about/react"}, "About React")
-				), 
-        React.createElement("li", null, 
-          React.createElement(NavLink, {to: "/about/mean"}, "About Mean")
-        ), 
-				React.createElement("li", {className: "pull-right"}, 
-					 React.createElement("a", {href: "#"}, "Log in")
-				)
-			)
-		)
-	)
-)
+      React.createElement("div", {className: "row"}, 
+      React.createElement("div", {className: "col-md-12"}, 
+      React.createElement("ul", {className: "nav nav-pills"}, 
+      React.createElement("li", null, 
+      React.createElement(NavLink, {to: "/home"}, "Home")
+      ), 
+      React.createElement("li", null, 
+      React.createElement(NavLink, {to: "/moviebox"}, "Movie Box")
+      ), 
+      React.createElement("li", null, 
+      React.createElement(NavLink, {to: "/favmovie"}, "Favourite Movie")
+      ), 
+      React.createElement("li", null, 
+      React.createElement(NavLink, {to: "/about/react"}, "About React")
+      ), 
+      React.createElement("li", null, 
+      React.createElement(NavLink, {to: "/about/mean"}, "About Mean")
+      ), 
+      React.createElement("li", {className: "pull-right"}, 
+      React.createElement("a", {href: "#"}, "Log in")
+      )
+      )
+      )
+      )
+      )
     )
   }
 })

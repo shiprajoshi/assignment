@@ -6,7 +6,7 @@ var About=React.createClass({
     return (
       <div>
       <div>
-        <h3> I am {this.props.params.id}</h3>
+      <h3> I am {this.props.params.id}</h3>
       </div>
       </div>
     )

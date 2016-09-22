@@ -11,7 +11,6 @@ var movie = require('./routes/movie');
 var user=require('./model/users');
 var mongoose=require('mongoose')
 
-
 var app = express();
 
 mongoose.connect('mongodb://localhost:27017/userdb',function(error){
